@@ -2,13 +2,12 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>ETL Pipeline Project</title>
 </head>
 <body>
 
-<h1>ETL Pipeline Project</h1>
+<h1>🧵 Fashion Product ETL Pipeline</h1>
 
-<p>Proyek ini merupakan implementasi sederhana dari proses ETL (Extract, Transform, Load) menggunakan Python untuk mengambil data produk dari sumber eksternal, membersihkannya, dan menyimpannya ke dalam database PostgreSQL, file CSV, dan file JSON.</p>
+<p>Proyek ini adalah pipeline ETL (Extract, Transform, Load) sederhana untuk mengambil data produk fashion dari situs Fashion Studio Dicoding, membersihkannya, dan menyimpannya ke database PostgreSQL serta file lokal (CSV dan JSON).</p>
 
 <h2>📁 Struktur Proyek</h2>
 <pre>
@@ -103,5 +102,11 @@ coverage run -m unittest tests/test_load.py</code></pre>
 <hr>
 <p><strong>Lisensi:</strong> Proyek ini bebas digunakan untuk tujuan edukasi dan pengembangan pribadi.</p>
 
+<h2>📌 Catatan</h2>
+  <ul>
+    <li>Nilai tukar USD ke IDR digunakan sebesar <strong>16.000</strong></li>
+    <li>Produk dengan nilai invalid seperti <code>No title</code> atau <code>Price Unavailable</code> akan disaring saat transformasi</li>
+    <li><code>google-sheets-api.json</code> belum digunakan, tetapi disiapkan untuk fitur ekspor ke Google Sheets di masa depan</li>
+  </ul>
 </body>
 </html>
