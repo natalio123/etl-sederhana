@@ -1,0 +1,59 @@
+Cara Menjalankan Script ETL Pipeline
+Untuk menjalankan ETL (Extract, Transform, Load) pipeline ini, ikuti langkah-langkah berikut:
+
+1. Pastikan semua dependensi terinstall
+pip install -r requirements.txt
+
+2. Setup konfigurasi
+Buat file .env di root project dan isi dengan konfigurasi yang diperlukan:
+# Database configuration
+DB_HOST=localhost
+DB_NAME=product_db
+DB_USER=developer
+DB_PASSWORD=secretpassword
+DB_PORT=5432
+
+3. Jalankan ETL Pipeline
+python main.py
+
+4. Output
+Data CSV akan disimpan di products.csv
+Data JSON akan disimpan di products.json
+Data akan disimpan di database PostgreSQL pada tabel products
+
+Cara Menjalankan Unit Test
+Unit test telah dibuat untuk setiap komponen ETL pipeline. Untuk menjalankan semua unit test:
+
+1. Menjalankan semua unit test
+python -m unittest discover tests
+
+2. Menjalankan unit test spesifik
+# Test untuk modul extract
+python -m unittest tests/test_extract.py
+
+# Test untuk modul transform
+python -m unittest tests/test_transform.py
+
+# Test untuk modul load
+python -m unittest tests/test_load.py
+
+Cara Menjalankan Test Coverage
+Test coverage digunakan untuk mengukur seberapa banyak kode yang telah diuji. Project ini menggunakan coverage untuk mengukur test coverage.
+
+1. Menjalankan coverage untuk semua unit test
+coverage run -m unittest discover tests
+
+2. Menjalankan coverage untuk modul spesifik
+# Coverage untuk modul load
+coverage run -m unittest tests/test_load.py
+
+3. Melihat laporan coverage
+coverage report
+Laporan ini akan menampilkan persentase coverage untuk setiap file dalam project.
+
+4. Menghasilkan laporan coverage HTML (lebih detail)
+coverage html
+Laporan HTML akan dibuat di folder htmlcov. Buka file index.html di browser untuk melihat laporan detail.
+
+6. Melihat coverage hanya untuk modul tertentu
+coverage report -m utils/load.py
