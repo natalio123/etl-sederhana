@@ -2,88 +2,106 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
+  <title>ETL Pipeline Project</title>
 </head>
 <body>
 
-  <h1>🧵 Fashion Product ETL Pipeline</h1>
-  <p>
-    Proyek ini adalah pipeline ETL (Extract, Transform, Load) sederhana untuk mengambil data produk fashion dari situs 
-    <a href="https://fashion-studio.dicoding.dev/">Fashion Studio Dicoding</a>, membersihkannya, dan menyimpannya ke database PostgreSQL 
-    serta file lokal (CSV dan JSON).
-  </p>
+<h1>ETL Pipeline Project</h1>
 
-  <hr>
+<p>Proyek ini merupakan implementasi sederhana dari proses ETL (Extract, Transform, Load) menggunakan Python untuk mengambil data produk dari sumber eksternal, membersihkannya, dan menyimpannya ke dalam database PostgreSQL, file CSV, dan file JSON.</p>
 
-  <h2>📁 Struktur Proyek</h2>
-  <pre><code>
-├── tests/                     # Unit tests
+<h2>📁 Struktur Proyek</h2>
+<pre>
+├── tests/
 │   ├── test_extract.py
 │   ├── test_transform.py
 │   └── test_load.py
-├── utils/                     # Modul ETL
-│   ├── extract.py             # Fungsi scraping data
-│   ├── transform.py           # Fungsi pembersihan & transformasi data
-│   └── load.py                # Fungsi penyimpanan data
-├── main.py                    # Entry point program ETL
-├── requirements.txt           # Daftar dependensi Python
-└── README.md                  # Dokumentasi proyek
-  </code></pre>
+├── utils/
+│   ├── extract.py
+│   ├── transform.py
+│   └── load.py
+├── main.py
+├── submission.txt
+├── products.csv
+├── products.json
+└── requirements.txt
+</pre>
 
-  <hr>
+<h2>🚀 Cara Menjalankan Script ETL Pipeline</h2>
 
-  <h2>🚀 Cara Menjalankan</h2>
-  <ol>
-    <li><strong>Clone repositori dan pindah ke folder proyek:</strong>
-      <pre><code>git clone https://github.com/username/etl-sederhana.git
+<ol>
+<li><strong>Clone repositori dan pindah ke folder proyek:</strong>
+      <pre><code>git clone https://github.com/natalio123/etl-sederhana.git
 cd etl-sederhana</code></pre>
     </li>
-    <li><strong>Install dependencies:</strong>
-      <pre><code>pip install -r requirements.txt</code></pre>
-    </li>
-    <li><strong>Jalankan pipeline:</strong>
-      <pre><code>python main.py</code></pre>
-    </li>
-  </ol>
+  <li><strong>Install semua dependensi:</strong><br>
+    <pre><code>pip install -r requirements.txt</code></pre>
+  </li>
 
-  <hr>
+  <li><strong>Setup konfigurasi:</strong><br>
+    <pre><code># Database configuration
+DB_HOST=localhost
+DB_NAME=product_db
+DB_USER=developer
+DB_PASSWORD=secretpassword
+DB_PORT=5432
+  </li>
+  <li><strong>Jalankan ETL Pipeline:</strong>
+    <pre><code>python main.py</code></pre>
+  </li>
+</ol>
 
-  <h2>⚙️ Konfigurasi Database</h2>
-  <p>Pastikan PostgreSQL sudah berjalan dan database <code>product_db</code> sudah dibuat.</p>
-  <p>Contoh <code>connection_params</code> yang digunakan:</p>
-  <pre><code>{
-    "host": "localhost",
-    "database": "product_db",
-    "user": "developer",
-    "password": "secretpassword",
-    "port": 5432
-}</code></pre>
+<h3> Output</h3>
+<ul>
+  <li>File CSV: <code>products.csv</code></li>
+  <li>File JSON: <code>transformed_products.json</code></li>
+  <li>Data dimuat ke PostgreSQL di tabel <code>products</code></li>
+</ul>
 
-  <hr>
+<h2> Cara Menjalankan Unit Test</h2>
 
-  <h2>🧪 Testing</h2>
-  <p>Untuk menjalankan unit test:</p>
-  <pre><code>python -m unittest tests//</code></pre>
+<p>Unit test telah dibuat untuk setiap komponen ETL pipeline.</p>
 
-  <hr>
+<h3>Menjalankan semua unit test</h3>
+<pre><code>python -m unittest discover tests</code></pre>
 
-  <h2>📦 Output</h2>
-  <ul>
-    <li><code>products.csv</code> → Data produk dalam format CSV</li>
-    <li>Data juga akan disimpan ke tabel <code>products</code> di PostgreSQL</li>
-  </ul>
+<h3>Menjalankan test spesifik</h3>
+<pre><code># Test untuk modul extract
+python -m unittest tests/test_extract.py
 
-  <hr>
+# Test untuk modul transform
+python -m unittest tests/test_transform.py
 
-  <h2>📌 Catatan</h2>
-  <ul>
-    <li>Nilai tukar USD ke IDR digunakan sebesar <strong>16.000</strong></li>
-    <li>Produk dengan nilai invalid seperti <code>No title</code> atau <code>Price Unavailable</code> akan disaring atau dibersihkan saat transformasi</li>
-  </ul>
+# Test untuk modul load
+python -m unittest tests/test_load.py
+</code></pre>
 
-  <hr>
+<h3>Menjalankan test individual</h3>
+<pre><code># Contoh menjalankan satu test spesifik
+python -m unittest tests.test_load.TestLoadFunctions.test_save_to_csv_dataframe
+</code></pre>
 
-  <h2>📄 Lisensi</h2>
-  <p>Proyek ini bersifat open-source. Bebas digunakan untuk belajar dan pengembangan.</p>
+<h2> Cara Menjalankan Test Coverage</h2>
+
+<h3>Menjalankan coverage untuk semua unit test</h3>
+<pre><code>coverage run -m unittest discover tests</code></pre>
+
+<h3>Menjalankan coverage untuk modul spesifik</h3>
+<pre><code># Coverage untuk modul load
+coverage run -m unittest tests/test_load.py</code></pre>
+
+<h3>Melihat laporan coverage</h3>
+<pre><code>coverage report</code></pre>
+
+<h3>Menghasilkan laporan coverage dalam bentuk HTML</h3>
+<pre><code>coverage html</code></pre>
+<p>Laporan akan disimpan di folder <code>htmlcov</code>. Buka <code>htmlcov/index.html</code> di browser untuk melihat laporan detail.</p>
+
+<h3>Melihat coverage hanya untuk modul tertentu</h3>
+<pre><code>coverage report -m utils/load.py</code></pre>
+
+<hr>
+<p><strong>Lisensi:</strong> Proyek ini bebas digunakan untuk tujuan edukasi dan pengembangan pribadi.</p>
 
 </body>
 </html>
