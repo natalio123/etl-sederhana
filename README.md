@@ -53,7 +53,7 @@ DB_PORT=5432</code></pre>
 <h3>📤 Output</h3>
 <ul>
   <li>File CSV: <code>products.csv</code></li>
-  <li>File JSON: <code>transformed_products.json</code></li>
+  <li>File JSON: <code>products.json</code></li>
   <li>Data dimuat ke PostgreSQL di tabel <code>products</code></li>
 </ul>
 
