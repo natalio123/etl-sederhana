@@ -78,7 +78,6 @@ cd etl-sederhana</code></pre>
   <ul>
     <li>Nilai tukar USD ke IDR digunakan sebesar <strong>16.000</strong></li>
     <li>Produk dengan nilai invalid seperti <code>No title</code> atau <code>Price Unavailable</code> akan disaring atau dibersihkan saat transformasi</li>
-    <li><code>google-sheets-api.json</code> belum digunakan, tapi disiapkan untuk fitur ekspor ke Google Sheets di masa depan</li>
   </ul>
 
   <hr>
