@@ -1,199 +1,184 @@
 import unittest
+import sys
+import os
 import pandas as pd
 import numpy as np
-from utils.transform import transform_data, transform_to_DataFrame, DIRTY_PATTERNS
+from unittest.mock import patch, MagicMock
 
+# Add parent directory to path so we can import the transform module
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from utils.transform import transform_data, transform_to_DataFrame, clean_existing_dataframe, DIRTY_PATTERNS
 
 class TestTransform(unittest.TestCase):
 
-    def test_transform_data_valid_inputs(self):
-        """Test transform_data with valid input values"""
-        test_data = [
+    def setUp(self):
+        # Sample data for testing
+        self.sample_data = [
             {
-                "Title": "Nike Running Shoes",
-                "Price": "$120.50",
-                "Rating": "4.5 / 5",
+                "Title": "T-shirt",
+                "Price": "$25.99",
+                "Rating": "4.5/5",
                 "Colors": "3 colors",
-                "Size": "Medium",
+                "Size": "M",
                 "Gender": "Men"
-            }
-        ]
-        
-        result = transform_data(test_data)
-        
-        self.assertEqual(result[0]["Title"], "Nike Running Shoes")
-        self.assertEqual(result[0]["Price"], 120.50 * 16000)
-        self.assertEqual(result[0]["Rating"], 4.5)
-        self.assertEqual(result[0]["Colors"], 3)
-        self.assertEqual(result[0]["Size"], "Medium")
-        self.assertEqual(result[0]["Gender"], "Men")
-
-    def test_transform_data_missing_values(self):
-        """Test transform_data with missing values"""
-        test_data = [
+            },
             {
-                "Title": "Adidas T-shirt",
-                "Price": None,
-                "Rating": None,
-                "Colors": None,
-                "Size": "Large",
+                "Title": "Hoodie",
+                "Price": "$49.99",
+                "Rating": "4.8/5",
+                "Colors": "5 colors",
+                "Size": "L",
+                "Gender": "Unisex"
+            },
+            {
+                "Title": "Unknown Product",  # Invalid title
+                "Price": "$35.50",
+                "Rating": "3.9/5",
+                "Colors": "2 colors",
+                "Size": "XL",
                 "Gender": "Women"
-            }
-        ]
-        
-        result = transform_data(test_data)
-        
-        self.assertEqual(result[0]["Title"], "Adidas T-shirt")
-        self.assertIsNone(result[0]["Price"])
-        self.assertIsNone(result[0]["Rating"])
-        self.assertIsNone(result[0]["Colors"])
-        self.assertEqual(result[0]["Size"], "Large")
-        self.assertEqual(result[0]["Gender"], "Women")
-
-    def test_transform_data_dirty_patterns(self):
-        """Test transform_data with dirty pattern values"""
-        test_data = [
+            },
             {
-                "Title": "Unknown Product",
-                "Price": "Price Unavailable",
-                "Rating": "Not Rated",
-                "Colors": "Unknown",
-                "Size": "Small",
+                "Title": "Pants",
+                "Price": "Price Unavailable",  # Invalid price
+                "Rating": "4.2/5",
+                "Colors": "4 colors",
+                "Size": "M",
+                "Gender": "Men"
+            },
+            {
+                "Title": "Jacket",
+                "Price": "$42.75",
+                "Rating": "Not Rated",  # Invalid rating
+                "Colors": "3 colors",
+                "Size": "S",
+                "Gender": "Women"
+            },
+            {
+                "Title": "",  # Empty title
+                "Price": "$15.99",
+                "Rating": "3.6/5",
+                "Colors": "2 colors", 
+                "Size": "M",
                 "Gender": "Unisex"
             }
         ]
-        
-        result = transform_data(test_data)
-        
-        self.assertIsNone(result[0]["Title"])
-        self.assertIsNone(result[0]["Price"])
-        self.assertIsNone(result[0]["Rating"])
-        self.assertIsNone(result[0]["Colors"])
-        self.assertEqual(result[0]["Size"], "Small")
-        self.assertEqual(result[0]["Gender"], "Unisex")
 
-    def test_transform_data_edge_cases(self):
-        """Test transform_data with edge cases"""
-        test_data = [
-            {
-                "Title": "Puma Jacket",
-                "Price": "$0.00",
-                "Rating": "0.0 / 5",
-                "Colors": "0 colors",
-                "Size": "",
-                "Gender": None
-            }
-        ]
+    def test_transform_data(self):
+        """Test the transform_data function correctly transforms data"""
+        transformed = transform_data(self.sample_data)
         
-        result = transform_data(test_data)
+        # Should only have valid entries (3 entries should be filtered out)
+        self.assertEqual(len(transformed), 3)
         
-        self.assertEqual(result[0]["Title"], "Puma Jacket")
-        self.assertEqual(result[0]["Price"], 0.0)
-        self.assertEqual(result[0]["Rating"], 0.0)
-        self.assertEqual(result[0]["Colors"], 0)
-        self.assertEqual(result[0]["Size"], "")
-        self.assertIsNone(result[0]["Gender"])
-
-    def test_transform_data_invalid_formats(self):
-        """Test transform_data with invalid format values"""
-        test_data = [
-            {
-                "Title": "Reebok Shorts",
-                "Price": "USD 75",  # Invalid price format
-                "Rating": "Good",   # Invalid rating format
-                "Colors": "Multiple",  # Invalid colors format
-                "Size": "XL",
-                "Gender": "Men"
-            }
-        ]
+        # Check first valid entry
+        self.assertEqual(transformed[0]["Title"], "T-shirt")
+        self.assertEqual(transformed[0]["Price"], 25.99 * 16000)
+        self.assertEqual(transformed[0]["Rating"], 4.5)
+        self.assertEqual(transformed[0]["Colors"], 3)
+        self.assertEqual(transformed[0]["Size"], "M")
+        self.assertEqual(transformed[0]["Gender"], "Men")
         
-        result = transform_data(test_data)
+        # Check second valid entry
+        self.assertEqual(transformed[1]["Title"], "Hoodie")
+        self.assertEqual(transformed[1]["Price"], 49.99 * 16000)
+        self.assertEqual(transformed[1]["Rating"], 4.8)
+        self.assertEqual(transformed[1]["Colors"], 5)
         
-        self.assertEqual(result[0]["Title"], "Reebok Shorts")
-        self.assertIsNone(result[0]["Price"])
-        self.assertIsNone(result[0]["Rating"])
-        self.assertIsNone(result[0]["Colors"])
-        self.assertEqual(result[0]["Size"], "XL")
-        self.assertEqual(result[0]["Gender"], "Men")
-
-    def test_transform_data_multiple_items(self):
-        """Test transform_data with multiple items"""
-        test_data = [
-            {
-                "Title": "Nike Running Shoes",
-                "Price": "$120.50",
-                "Rating": "4.5 / 5",
-                "Colors": "3 colors",
-                "Size": "Medium",
-                "Gender": "Men"
-            },
-            {
-                "Title": "Unknown Product",
-                "Price": "$85.75",
-                "Rating": "3.8 / 5",
-                "Colors": "2 colors",
-                "Size": "Small",
-                "Gender": "Women"
-            }
-        ]
+        # Verify invalid entries are filtered out
+        titles = [product["Title"] for product in transformed]
+        self.assertNotIn("Unknown Product", titles)
+        self.assertNotIn("", titles)
         
-        result = transform_data(test_data)
-        
-        self.assertEqual(len(result), 2)
-        self.assertEqual(result[0]["Title"], "Nike Running Shoes")
-        self.assertIsNone(result[1]["Title"])
-        self.assertEqual(result[1]["Price"], 85.75 * 16000)
+        # Check that all prices are valid (no None or NaN)
+        for product in transformed:
+            self.assertIsNotNone(product["Price"])
+            self.assertFalse(pd.isna(product["Price"]))
 
     def test_transform_to_DataFrame(self):
-        """Test transform_to_DataFrame function"""
-        test_data = [
+        """Test the transform_to_DataFrame function creates a valid DataFrame"""
+        df = transform_to_DataFrame(self.sample_data)
+        
+        # Check DataFrame properties
+        self.assertFalse(df.empty)
+        self.assertEqual(len(df), 3)  # Only 3 valid entries should remain
+        self.assertIn("Title", df.columns)
+        self.assertIn("Price", df.columns)
+        self.assertIn("Rating", df.columns)
+        self.assertIn("Colors", df.columns)
+        self.assertIn("Size", df.columns)
+        self.assertIn("Gender", df.columns)
+        
+        # Check that there are no NaN values in critical columns
+        self.assertFalse(df["Title"].isna().any())
+        self.assertFalse(df["Price"].isna().any())
+        
+        # Check price conversion to IDR
+        self.assertGreaterEqual(df["Price"].min(), 15.99 * 16000)
+
+    def test_clean_existing_dataframe(self):
+        """Test the clean_existing_dataframe function cleans problematic data"""
+        # Create a DataFrame with problematic data
+        problematic_df = pd.DataFrame({
+            "Title": ["Product A", "", "Product B", "Product C", None],
+            "Price": [1000, 2000, np.nan, "NaN", 5000],
+            "Rating": [4.5, 3.8, 4.0, 3.9, 4.2],
+            "Colors": [3, 2, 5, 4, 3],
+            "Size": ["M", "L", "S", "XL", "XXL"],
+            "Gender": ["Men", "Women", "Unisex", "Men", "Women"]
+        })
+        
+        cleaned_df = clean_existing_dataframe(problematic_df)
+        
+        # Check that problematic rows are removed
+        self.assertEqual(len(cleaned_df), 2)  # Only 2 valid rows should remain
+        
+        # Check that no empty titles exist
+        self.assertFalse((cleaned_df["Title"] == "").any())
+        self.assertFalse(cleaned_df["Title"].isna().any())
+        
+        # Check that no NaN prices exist
+        self.assertFalse(cleaned_df["Price"].isna().any())
+        
+        # Verify the remaining rows are the expected ones
+        self.assertIn("Product A", cleaned_df["Title"].values)
+        self.assertIn(1000, cleaned_df["Price"].values)
+        self.assertIn(5000, cleaned_df["Price"].values)
+
+    def test_edge_cases(self):
+        """Test edge cases like empty lists and unusual values"""
+        # Test with empty list
+        empty_result = transform_data([])
+        self.assertEqual(empty_result, [])
+        
+        empty_df = transform_to_DataFrame([])
+        self.assertTrue(empty_df.empty)
+        
+        # Test with unusual price formats
+        unusual_data = [
             {
-                "Title": "Nike Running Shoes",
-                "Price": "$120.50",
-                "Rating": "4.5 / 5",
-                "Colors": "3 colors",
-                "Size": "Medium",
-                "Gender": "Men"
+                "Title": "Special Product",
+                "Price": "$1,234.56",  # Comma in price
+                "Rating": "4.9/5",
+                "Colors": "2 colors",
+                "Size": "M",
+                "Gender": "Unisex"
             },
             {
-                "Title": "Adidas T-shirt",
-                "Price": "$45.99",
-                "Rating": "4.0 / 5",
-                "Colors": "5 colors",
-                "Size": "Large",
-                "Gender": "Women"
+                "Title": "Discount Item",
+                "Price": "$99.99 $79.99",  # Multiple prices
+                "Rating": "4.2/5",
+                "Colors": "3 colors",
+                "Size": "L",
+                "Gender": "Men"
             }
         ]
         
-        df = transform_to_DataFrame(test_data)
-        
-        # Check DataFrame properties
-        self.assertIsInstance(df, pd.DataFrame)
-        self.assertEqual(len(df), 2)
-        self.assertEqual(list(df.columns), ["Title", "Price", "Rating", "Colors", "Size", "Gender"])
-        
-        # Check values
-        self.assertEqual(df.iloc[0]["Title"], "Nike Running Shoes")
-        self.assertEqual(df.iloc[0]["Price"], 120.50 * 16000)
-        self.assertEqual(df.iloc[0]["Rating"], 4.5)
-        self.assertEqual(df.iloc[0]["Colors"], 3)
-        
-        self.assertEqual(df.iloc[1]["Title"], "Adidas T-shirt")
-        self.assertEqual(df.iloc[1]["Price"], 45.99 * 16000)
-        self.assertEqual(df.iloc[1]["Rating"], 4.0)
-        self.assertEqual(df.iloc[1]["Colors"], 5)
-
-    def test_DIRTY_PATTERNS(self):
-        """Test DIRTY_PATTERNS constant"""
-        self.assertIn("Unknown Product", DIRTY_PATTERNS["Title"])
-        self.assertIn("No title", DIRTY_PATTERNS["Title"])
-        self.assertIn("Invalid Rating / 5", DIRTY_PATTERNS["Rating"])
-        self.assertIn("Not Rated", DIRTY_PATTERNS["Rating"])
-        self.assertIn(None, DIRTY_PATTERNS["Rating"])
-        self.assertIn("Price Unavailable", DIRTY_PATTERNS["Price"])
-        self.assertIn("Price Not Found", DIRTY_PATTERNS["Price"])
-        self.assertIn(None, DIRTY_PATTERNS["Price"])
-
+        # The regex should extract the first number it finds
+        transformed = transform_data(unusual_data)
+        self.assertEqual(len(transformed), 2)
+        self.assertEqual(transformed[0]["Price"], 1234.56 * 16000)
+        self.assertEqual(transformed[1]["Price"], 99.99 * 16000)
 
 if __name__ == "__main__":
     unittest.main()
