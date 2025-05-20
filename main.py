@@ -1,8 +1,14 @@
+import os
+from dotenv import load_dotenv
+
 from utils.extract import scrape_product
 from utils.transform import transform_to_DataFrame
 from utils.load import store_to_postgre, save_to_csv, save_to_json
 
 def main():
+    # Load environment variables dari .env file
+    load_dotenv()
+
     FIRST_PAGE_URL = 'https://fashion-studio.dicoding.dev/'
     BASE_URL = 'https://fashion-studio.dicoding.dev/page{}'
 
@@ -24,11 +30,11 @@ def main():
 
     print("Menyimpan data ke PostgreSQL...")
     connection_params = {
-        "host": "localhost",
-        "database": "product_db",
-        "user": "developer",
-        "password": "secretpassword",
-        "port": 5432
+        "host": os.getenv("DB_HOST"),
+        "database": os.getenv("DB_NAME"),
+        "user": os.getenv("DB_USER"),
+        "password": os.getenv("DB_PASSWORD"),
+        "port": int(os.getenv("DB_PORT", 5432))  # fallback default port
     }
 
     success = store_to_postgre(transformed_df, table_name="products", connection_params=connection_params)
