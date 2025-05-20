@@ -13,6 +13,24 @@ DB_USER=developer
 DB_PASSWORD=secretpassword
 DB_PORT=5432
 
+Setup database PostgreSQL menggunakan perintah-perintah sebagai berikut
+A. Pertama, masuk ke PostgreSQL sebagai user postgres (pengguna admin default):
+Pengguna Linux:
+sudo -u postgres psql
+
+Pengguna Windows/MacOS (melalui Command Prompt/Homebrew)
+psql --username postgres
+
+B. Buat user 'developer' dengan password 'secretpassword':
+CREATE USER developer WITH ENCRYPTED PASSWORD 'secretpassword';
+
+C. Buat database 'product_db':
+CREATE DATABASE product_db;
+
+D. Berikan hak akses penuh pada database 'product_db' kepada user 'developer':
+GRANT ALL ON DATABASE product_db TO developer;
+ALTER DATABASE product_db OWNER TO developer;
+
 3. Jalankan ETL Pipeline
 python main.py
 
